@@ -12,6 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+/**
+ * This class which implements CommandLineRunner runs as soon as the app is launched.
+ * It loads some demo data of blacklisted Iban's used for checking against scanned Iban's inputted.
+ */
 @Component
 @RequiredArgsConstructor
 public class BootstrapData implements CommandLineRunner {
@@ -24,6 +28,9 @@ public class BootstrapData implements CommandLineRunner {
         loadBlackListedIbanData();
     }
 
+    /**
+     * Here the aforementioned demo data gets loaded into the repository.
+     */
     private void loadBlackListedIbanData() {
         if (blacklistedIbanRepository.count() == 0) {
             BlacklistedIban newIban1 = BlacklistedIban.builder()

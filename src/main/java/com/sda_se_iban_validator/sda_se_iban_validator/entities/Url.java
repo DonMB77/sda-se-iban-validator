@@ -14,6 +14,9 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
+/**
+ * Entity used for storing data within the database and usage with repositories.
+ */
 @Getter
 @Setter
 @Builder

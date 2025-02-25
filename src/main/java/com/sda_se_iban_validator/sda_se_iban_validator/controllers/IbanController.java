@@ -20,28 +20,51 @@ import java.util.UUID;
 @RestController
 public class IbanController {
 
+    /**
+     * Constants storing the API Endpoints URI's. These are declared here once,
+     * then used throughout the application. DRY-principle.
+     */
     public static final String IBAN_DOCUMENT_PDF_IMPORT_PATH_LOCAL_FILE = "/api/v1/pdfImportLocal";
     public static final String IBAN_DOCUMENT_PDF_IMPORT_PATH_ONLINE_FILE = "/api/v1/pdfImportOnline";
     public static final String BLACKLISTED_IBAN_PATH = "/api/v1/blacklistedIban";
     public static final String BLACKLISTED_IBAN_PATH_ID = BLACKLISTED_IBAN_PATH + "/{id}";
+    public static final String CURRENTLY_STORED_IBANS_PATH = "/api/v1/storedIbans";
 
     private final IbanService ibanService;
     private final UrlService urlService;
 
+    /**
+     * Method used to receive and store new blacklisted IBAN's.
+     * @param blacklistedIban Standard IBAN format (DE15 3006 0601 0505 7807 82)
+     * @return We return a ResponseEntity with the correct status.
+     */
     @PostMapping(BLACKLISTED_IBAN_PATH)
-    public ResponseEntity handlePost(@RequestBody BlacklistedIban blacklistedIban) {
+    public ResponseEntity handlePostOfBlacklistedIbans(@RequestBody BlacklistedIban blacklistedIban) {
         ibanService.saveNewBlacklistedIban(blacklistedIban);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * Method used to delete stored blacklisted IBAN's by id.
+     * @param id Id of the to be deleted blacklisted IBAN
+     * @return We return a ResponseEntity with the correct status.
+     */
     @DeleteMapping(BLACKLISTED_IBAN_PATH_ID)
-    public ResponseEntity handleDelete(@PathVariable("id") UUID id) {
+    public ResponseEntity handleDeleteOfBlacklistedIbans(@PathVariable("id") UUID id) {
         ibanService.deleteBlacklistedIbanById(id);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * Given a URL this method processes the given PDF file and stores all found IBAN's.
+     * It then is checked against all stored blacklisted IBAN's and returns a fitting response,
+     * depending on whether blacklisted IBAN's are found or not.
+     * @param url Standart URL
+     * @return We return a ResponseEntity with the correct status.
+     * @throws IOException If no file is found.
+     */
     @PostMapping(IBAN_DOCUMENT_PDF_IMPORT_PATH_ONLINE_FILE)
     public ResponseEntity handlePostOnlineFile(@RequestBody Url url) throws IOException {
 
@@ -66,10 +89,18 @@ public class IbanController {
                 .body("The given Invoice('s) does not contain any blacklisted Iban's and can be processed.");
     }
 
+    /**
+     * This method is used to import local files. The request must be in a Unix-like format.
+     * An example would be C:/Users/user/documents/exampleInvoices.pdf. Backslashes are not permitted.
+     * The given PDF is then processed and any found IBAN's are extracted. It then gets checked for blacklisted IBAN's.
+     * @param localFilePath Unix-like file path (C:/Users/user/documents/exampleInvoices.pdf)
+     * @return We return a ResponseEntity with the correct status.
+     * @throws IOException If no file is found.
+     */
     @PostMapping(IBAN_DOCUMENT_PDF_IMPORT_PATH_LOCAL_FILE)
-    public ResponseEntity handlePostLocalFile(@RequestBody Url url) throws IOException {
+    public ResponseEntity handlePostLocalFile(@RequestBody Url localFilePath) throws IOException {
 
-        Url savedUrl = urlService.saveNewUrl(url);
+        Url savedUrl = urlService.saveNewUrl(localFilePath);
 
         PdfExtractorLocalFile pdfExtractorLocalFile = new PdfExtractorLocalFile(savedUrl.getUrl());
         List<String> extractedIbans = pdfExtractorLocalFile.getIbansFromPDF();
@@ -91,8 +122,17 @@ public class IbanController {
                 .body("The given Invoice('s) does not contain any blacklisted Iban's and can be processed.");
     }
 
+    /**
+     * Produced a list of all blacklisted IBAN's currently stored.
+     * @return List of blacklisted IBAN's.
+     */
     @GetMapping(BLACKLISTED_IBAN_PATH)
     public List<BlacklistedIban> listBlacklistedIbans() {
         return ibanService.listBlacklistedIbans();
+    }
+
+    @GetMapping(CURRENTLY_STORED_IBANS_PATH)
+    public List<Iban> listCurrentlyStoredIbans() {
+        return ibanService.listToBeCheckedIbans();
     }
 }

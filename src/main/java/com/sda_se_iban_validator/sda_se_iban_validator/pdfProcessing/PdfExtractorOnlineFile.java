@@ -12,10 +12,17 @@ import java.util.List;
 import java.util.Scanner;
 import java.net.*;
 
+/**
+ * Class used for processing and extracting IBAN's of the given PDF files via local file path.
+ */
 public class PdfExtractorOnlineFile {
     private String text;
     private File file;
 
+    /**
+     * @param fileUrl Simple String using Unix-like local file paths.
+     * @throws IOException In case no file is found.
+     */
     public PdfExtractorOnlineFile(String fileUrl) throws IOException {
 
         try (BufferedInputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
@@ -38,10 +45,18 @@ public class PdfExtractorOnlineFile {
         document.close();
     }
 
+    /**
+     * Simple method returning the entire text from inputted PDF file.
+     */
     public String getTextFromPDF() {
         return text;
     }
 
+    /**
+     * Goes through the PDF file line by line and scans for IBAN's. They then get stored within a List.
+     * @return Returns list with all found IBAN's.
+     * @throws IOException In case no file is found.
+     */
     public List<String> getIbansFromPDF() throws IOException {
         List<String> outListWithIbans = new ArrayList<>();
         String matchIbanString = "IBAN";

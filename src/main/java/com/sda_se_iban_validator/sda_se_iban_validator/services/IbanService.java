@@ -14,5 +14,4 @@ public interface IbanService {
     List<Iban> listToBeCheckedIbans();
     BlacklistedIban saveNewBlacklistedIban(BlacklistedIban  blacklistedIban);
     Boolean deleteBlacklistedIbanById(UUID id);
-    Iban saveNewIbanOnlineFile(Iban iban);
 }

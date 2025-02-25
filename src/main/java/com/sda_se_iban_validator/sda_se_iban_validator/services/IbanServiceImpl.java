@@ -63,9 +63,4 @@ public class IbanServiceImpl implements IbanService {
         }
         return false;
     }
-
-    @Override
-    public Iban saveNewIbanOnlineFile(Iban iban) {
-        return null;
-    }
 }
