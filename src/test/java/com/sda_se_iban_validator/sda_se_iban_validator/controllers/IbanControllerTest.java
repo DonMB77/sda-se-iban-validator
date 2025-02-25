@@ -18,9 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -88,6 +90,21 @@ class IbanControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newBlacklistedIban)))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
+
+    @Transactional
+    @Rollback
+    @Test
+    void testDeleteBlacklistedIban() throws Exception {
+        BlacklistedIban newBlacklistedIban = BlacklistedIban.builder()
+                .IBAN("DE15 3006 0601 0505 7807 84")
+                .build();
+        blacklistedIbanRepository.save(newBlacklistedIban);
+        mockMvc.perform(delete(IbanController.BLACKLISTED_IBAN_PATH_ID, newBlacklistedIban.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andReturn();
     }
