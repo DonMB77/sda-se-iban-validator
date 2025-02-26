@@ -7,6 +7,10 @@ import com.sda_se_iban_validator.sda_se_iban_validator.repositories.BlacklistedI
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Interface used for implementing services working and processing IBAN's
+ * Interfaces are used here for quick but robust implementations of those services.
+ */
 public interface IbanService {
     Iban saveNewIban(Iban iban);
     List<BlacklistedIban> listBlacklistedIbans();

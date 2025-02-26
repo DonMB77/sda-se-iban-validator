@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This test is used for testing the bootstrapping of data process.
+ * This is a DataJpaTest and component scanning is limited to JPA repositories and entities. Thus, we import the IbanService implementation manually.
+ */
 @DataJpaTest
 @Import(IbanServiceImpl.class)
 class BootstrapDataTest {

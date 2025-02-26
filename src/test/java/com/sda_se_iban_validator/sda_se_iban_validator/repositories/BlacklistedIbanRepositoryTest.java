@@ -6,17 +6,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests to ensure the correct interaction with the repository saving all blacklisted Iban's.
+ */
 @DataJpaTest
-@Import(BootstrapData.class)
 class BlacklistedIbanRepositoryTest {
 
     @Autowired
     BlacklistedIbanRepository blacklistedIbanRepository;
 
+    /**
+     * This test is in charge of ensuring that newly added blacklisted IBAN's are correctly saved.
+     */
+    @Transactional
+    @Rollback
     @Test
     void testSaveBeer() {
         BlacklistedIban blacklistedIban = blacklistedIbanRepository.save(BlacklistedIban.builder()

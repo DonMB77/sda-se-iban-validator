@@ -35,6 +35,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Class in charge of integration tests. Since this is a SpringBootTest, there is no mocking involved.
+ */
 @SpringBootTest
 class IbanControllerTest {
 
@@ -55,11 +58,17 @@ class IbanControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    /**
+     * We set up mockMvc before each test. Otherwise, mockMvc will equal null after each test.
+     */
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
+    /**
+     * Here we test the listing of all blacklisted IBAN's. We then check whether any blacklisted IBAN's are returned.
+     */
     @Test
     void testListBlacklistedIbans() {
         List<BlacklistedIban> blacklistedIbanList = ibanController.listBlacklistedIbans();
@@ -67,20 +76,11 @@ class IbanControllerTest {
         assertThat(blacklistedIbanList.size()).isGreaterThan(0);
     }
 
-    @Disabled
-    @Test
-    void testCreateUrlAndValidateIbans() throws Exception {
-        Url url = Url.builder()
-                .url("C:/Users/dmarc/OneDrive/Dokumente/Testdata_Invoices.pdf")
-                .build();
-        mockMvc.perform(post(IbanController.IBAN_DOCUMENT_PDF_IMPORT_PATH_LOCAL_FILE)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(url)))
-                .andExpect(status().isOk())
-                .andReturn();
-    }
-
+    /**
+     * Here the post operation regarding new blacklisted IBAN's is tested.
+     * MockMvc is used to perform post operations against the within the IbanController declared endpoint.
+     * @throws Exception
+     */
     @Test
     void testCreateBlacklistedIban() throws Exception {
         BlacklistedIban newBlacklistedIban = BlacklistedIban.builder()
@@ -94,6 +94,11 @@ class IbanControllerTest {
                 .andReturn();
     }
 
+    /**
+     * Here the delete operation regarding saved blacklisted IBAN's is tested.
+     * MockMvc is used to perform delete operations against the within the IbanController declared endpoint.
+     * @throws Exception
+     */
     @Transactional
     @Rollback
     @Test

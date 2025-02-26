@@ -12,6 +12,11 @@ public class UrlServiceImpl implements UrlService {
 
     private final UrlRepository urlRepository;
 
+    /**
+     * Here a new URL is saved to the repository. This URL is then used for extracting a PDF found.
+     * @param url URL of the PDF
+     * @return Saved instance of the type URL
+     */
     @Override
     public Url saveNewUrl(Url url) {
         Url savedUrl = url;
