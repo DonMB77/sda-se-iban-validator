@@ -24,11 +24,14 @@ public class PdfExtractorLocalFile {
      */
     public PdfExtractorLocalFile(String fileUrl) throws IOException {
         file = new File(fileUrl);
+        // PDDocument is the in-memory representation of the PDF document loaded
         PDDocument document = PDDocument.load(file);
 
+        // this will receive a PDF document and strip out the text
         PDFTextStripper pdfStripper = new PDFTextStripper();
         this.text = pdfStripper.getText(document);
 
+        // closing here is mandatory
         document.close();
     }
 
@@ -46,12 +49,18 @@ public class PdfExtractorLocalFile {
      */
     public List<String> getIbansFromPDF() throws IOException {
         List<String> outListWithIbans = new ArrayList<>();
+        // identifier or the IBAN:
         String matchIbanString = "IBAN";
         String tempStringHolder;
         String tempStringLine;
 
         Scanner scanner = new Scanner(text);
 
+        /*
+        In this loop we go through every line and scan every line for the aforementioned identifier.
+        Then the IBAN itself gets extracted and all the blank spaces are stripped.
+        We then save the extracted String in a List, which then gets returned after all lines are scanned.
+         */
         while (scanner.hasNextLine())
         {
             tempStringLine = scanner.nextLine();

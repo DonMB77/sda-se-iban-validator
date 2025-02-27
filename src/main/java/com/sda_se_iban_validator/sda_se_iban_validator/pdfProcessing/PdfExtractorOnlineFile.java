@@ -22,12 +22,14 @@ public class PdfExtractorOnlineFile {
     /**
      * @param fileUrl Simple String using Unix-like local file paths.
      * @throws IOException In case no file is found.
-     */
+     */Creates a file output stream to write to the file with the specified name.
     public PdfExtractorOnlineFile(String fileUrl) throws IOException {
 
+        // here a BufferedInputStream is used to receive a PDF using a URL
         try (BufferedInputStream in = new BufferedInputStream(new URL(fileUrl).openStream());
+             // the file output stream write to a file called Extracted_PDF.pdf, which is then further used to extract the IBAN's
              FileOutputStream fileOutputStream = new FileOutputStream("Extracted_PDF.pdf")) {
-            byte dataBuffer[] = new byte[1024];
+            byte[] dataBuffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                 fileOutputStream.write(dataBuffer, 0, bytesRead);
@@ -37,11 +39,14 @@ public class PdfExtractorOnlineFile {
         }
 
         file = new File("Extracted_PDF.pdf");
+        // PDDocument is the in-memory representation of the PDF document loaded
         PDDocument document = PDDocument.load(file);
 
+        // this will receive a PDF document and strip out the text
         PDFTextStripper pdfStripper = new PDFTextStripper();
         this.text = pdfStripper.getText(document);
 
+        // closing here is mandatory
         document.close();
     }
 
@@ -59,12 +64,18 @@ public class PdfExtractorOnlineFile {
      */
     public List<String> getIbansFromPDF() throws IOException {
         List<String> outListWithIbans = new ArrayList<>();
+        // identifier or the IBAN:
         String matchIbanString = "IBAN";
         String tempStringHolder;
         String tempStringLine;
 
         Scanner scanner = new Scanner(text);
 
+        /*
+        In this loop we go through every line and scan every line for the aforementioned identifier.
+        Then the IBAN itself gets extracted and all the blank spaces are stripped.
+        We then save the extracted String in a List, which then gets returned after all lines are scanned.
+         */
         while (scanner.hasNextLine())
         {
             tempStringLine = scanner.nextLine();

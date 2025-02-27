@@ -10,8 +10,10 @@ import com.sda_se_iban_validator.sda_se_iban_validator.services.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -66,11 +68,11 @@ public class IbanController {
      * @throws IOException If no file is found.
      */
     @PostMapping(IBAN_DOCUMENT_PDF_IMPORT_PATH_ONLINE_FILE)
-    public ResponseEntity handlePostOnlineFile(@RequestBody Url url) throws IOException {
+    public ResponseEntity handlePostOnlineFile(@Validated @RequestBody Url url) throws IOException {
 
         PdfExtractorOnlineFile pdfExtractorOnlineFile = new PdfExtractorOnlineFile(url.getUrl());
-        pdfExtractorOnlineFile.getIbansFromPDF();
         List<String> extractedIbans = pdfExtractorOnlineFile.getIbansFromPDF();
+        // here we go through every extracted IBAN and save them within our IbanRepository.
         extractedIbans.forEach(iban -> {
             Iban newIban = Iban.builder()
                     .IBAN(iban)
@@ -80,6 +82,7 @@ public class IbanController {
 
         List<Iban> currentSavedIbans = ibanService.listToBeCheckedIbans();
 
+        // depending on if the check comes back true, we respond with an appropriate response. Otherwise, we respond with "ok".
         if (ibanService.checkForBlacklistedIbans(currentSavedIbans)) {
             return ResponseEntity.badRequest()
                     .body("The given Invoice('s) contains blacklisted Iban's and cannot be processed!");
@@ -98,12 +101,15 @@ public class IbanController {
      * @throws IOException If no file is found.
      */
     @PostMapping(IBAN_DOCUMENT_PDF_IMPORT_PATH_LOCAL_FILE)
-    public ResponseEntity handlePostLocalFile(@RequestBody Url localFilePath) throws IOException {
+    public ResponseEntity handlePostLocalFile(@Validated @RequestBody Url localFilePath) throws IOException {
 
+        // we save the url here to be used later on
         Url savedUrl = urlService.saveNewUrl(localFilePath);
 
         PdfExtractorLocalFile pdfExtractorLocalFile = new PdfExtractorLocalFile(savedUrl.getUrl());
         List<String> extractedIbans = pdfExtractorLocalFile.getIbansFromPDF();
+
+        // here we go through every extracted IBAN and save them within our IbanRepository.
         extractedIbans.forEach(iban -> {
             Iban newIban = Iban.builder()
                     .IBAN(iban)
@@ -113,6 +119,7 @@ public class IbanController {
 
         List<Iban> currentSavedIbans = ibanService.listToBeCheckedIbans();
 
+        // depending on if the check comes back true, we respond with an appropriate response. Otherwise, we respond with "ok".
         if (ibanService.checkForBlacklistedIbans(currentSavedIbans)) {
             return ResponseEntity.badRequest()
                     .body("The given Invoice('s) contains blacklisted Iban's and cannot be processed!");
@@ -138,5 +145,14 @@ public class IbanController {
     @GetMapping(CURRENTLY_STORED_IBANS_PATH)
     public List<Iban> listCurrentlyStoredIbans() {
         return ibanService.listToBeCheckedIbans();
+    }
+
+    /**
+     * Simple ExceptionHandler in case no file has been found in the provided URL's.
+     * @return
+     */
+    @ExceptionHandler({FileNotFoundException.class})
+    public String fileNotFoundError() {
+        return "No file has been found. Please provide a link containing a PDF file.";
     }
 }

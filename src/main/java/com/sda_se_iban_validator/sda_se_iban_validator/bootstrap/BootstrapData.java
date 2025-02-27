@@ -32,6 +32,10 @@ public class BootstrapData implements CommandLineRunner {
      * Here the aforementioned demo data gets loaded into the repository.
      */
     private void loadBlackListedIbanData() {
+        /*
+        This logic is generally practical when not using an in-memory database. In this case this will always run true.
+        I still kept it, since its generally good practice for bootstrapping.
+         */
         if (blacklistedIbanRepository.count() == 0) {
             BlacklistedIban newIban1 = BlacklistedIban.builder()
                     .IBAN("DE15 3006 0601 0505 7807 82")
@@ -44,6 +48,5 @@ public class BootstrapData implements CommandLineRunner {
             blacklistedIbanRepository.save(newIban1);
             blacklistedIbanRepository.save(newIban2);
         }
-        System.out.println(blacklistedIbanRepository.count());
     }
 }

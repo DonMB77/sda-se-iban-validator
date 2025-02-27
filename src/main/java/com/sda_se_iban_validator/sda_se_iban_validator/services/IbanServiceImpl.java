@@ -49,10 +49,13 @@ public class IbanServiceImpl implements IbanService {
      */
     @Override
     public Boolean checkForBlacklistedIbans(List<Iban> ibansToBeChecked) {
+        // Here all blacklisted IBAN's are saved within a List, which is then used to check against.
         List<BlacklistedIban> blacklistedIbans = blacklistedIbanRepository.findAll();
+        // All blacklisted and to be checked IBAN's are saved to a List
         List<String> blacklistedIbansString = blacklistedIbans.stream().map(BlacklistedIban::getIBAN).toList();
         List<String> ibansToBeCheckedString = ibansToBeChecked.stream().map(Iban::getIBAN).toList();
 
+        // The two lists are now checked for matching IBAN's
         for (String iban : ibansToBeCheckedString) {
             for (String blacklistedIban : blacklistedIbansString) {
                 if (iban.equals(blacklistedIban)) {

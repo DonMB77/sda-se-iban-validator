@@ -24,6 +24,7 @@ Example Request:\
   "url": "C:/Users/exampleUser/exampleFolder/Testdata_Invoices.pdf"
 }
 ``
+Beware that the url has to be in a UNIX-like format!!
 
 Response: 
 - ``200 OK`` in case no blacklisted IBAN'S are found
