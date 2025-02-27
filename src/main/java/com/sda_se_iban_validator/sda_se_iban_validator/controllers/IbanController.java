@@ -131,6 +131,10 @@ public class IbanController {
         return ibanService.listBlacklistedIbans();
     }
 
+    /**
+     * Returns a List of all currently stored checked IBAN's currently stored.
+     * @return List of checked IBAN's since the application has been run.
+     */
     @GetMapping(CURRENTLY_STORED_IBANS_PATH)
     public List<Iban> listCurrentlyStoredIbans() {
         return ibanService.listToBeCheckedIbans();

@@ -57,9 +57,8 @@ public class PdfExtractorLocalFile {
             tempStringLine = scanner.nextLine();
             if(tempStringLine.contains(matchIbanString)) {
                 int indexStart = tempStringLine.indexOf("IBAN") + 5;
-                int indexEnd = tempStringLine.indexOf("IBAN")+33;
+                int indexEnd = tempStringLine.indexOf("IBAN")+34;
                 tempStringHolder = tempStringLine.substring(indexStart, indexEnd);
-                System.out.println(tempStringHolder);
                 tempStringHolder = tempStringHolder.strip();
                 outListWithIbans.add(tempStringHolder);
             }
