@@ -22,7 +22,7 @@ public class PdfExtractorOnlineFile {
     /**
      * @param fileUrl Simple String using Unix-like local file paths.
      * @throws IOException In case no file is found.
-     */Creates a file output stream to write to the file with the specified name.
+     */
     public PdfExtractorOnlineFile(String fileUrl) throws IOException {
 
         // here a BufferedInputStream is used to receive a PDF using a URL
